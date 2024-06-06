@@ -17,7 +17,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const authRouter = require('./routes/authRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
-
+const bookingController = require('./controllers/bookingController');
+const bodyParser = require('body-parser');
 const app = express();
 app.enable('trust proxy');
 app.set('view engine', 'pug');
@@ -48,6 +49,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+app.post(
+  'checkout-webhook',
+  // express.raw({ type: 'application/json' }),
+  bodyParser.raw({ type: 'application/json' }),
+  bookingController.checkoutWebHook
+);
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

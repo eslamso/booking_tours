@@ -49,14 +49,21 @@ async function main() {
 //   console.log('Secret: ', secret.base32);
 //   console.log('Code: ', code);
 // };
-const signToken = id => {
-  return jwt.sign({ id }, 'i love you', {
-    expiresIn: '90d'
-  });
-};
-//console.log(signToken('46164af6f5a6fag6'));
-const hashedToken = crypto
-  .createHash('sha256')
-  .update('hellllllllllo')
-  .digest('hex');
-console.log(hashedToken);
+// const signToken = id => {
+//   return jwt.sign({ id }, 'i love you', {
+//     expiresIn: '90d'
+//   });
+// };
+// //console.log(signToken('46164af6f5a6fag6'));
+// const hashedToken = crypto
+//   .createHash('sha256')
+//   .update('hellllllllllo')
+//   .digest('hex');
+// console.log(hashedToken);
+const event = require('node:events');
+const { EventEmitter } = require('stream');
+const eventEmitter = new EventEmitter();
+eventEmitter.on('start', () => {
+  console.log('helooo event emitter');
+});
+//eventEmitter.emit('start');
