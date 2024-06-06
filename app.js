@@ -6,8 +6,9 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
-
+const compression = require('compression');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -18,7 +19,7 @@ const authRouter = require('./routes/authRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
-
+app.enable('trust proxy');
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -34,6 +35,11 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+//implement CORS
+app.use(cors());
+//allow every one to consume out apis for simple request e.g post or get
+app.options('*', cors());
+//option is an http method and by donig this we allow non simple request to be access by other domain or subdomain or other ports
 // Limit requests from same API
 const limiter = rateLimit({
   max: 100,
@@ -66,11 +72,11 @@ app.use(
     ]
   })
 );
-
+app.use(compression());
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
+  // console.log(req.cookies);
   next();
 });
 
