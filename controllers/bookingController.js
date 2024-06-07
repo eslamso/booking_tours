@@ -91,7 +91,7 @@ exports.checkoutWebHook = async (req, res, next) => {
     console.log('web hook error');
     return res.status(400).send(`webhook Error :${err.message}`);
   }
-  if (event.type === 'payment_intent.succeeded') {
+  if (event.type === 'checkout.session.completed') {
     console.log('session is recevied ::', event);
 
     createBookingCheckout(event.data.object);
