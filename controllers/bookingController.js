@@ -15,7 +15,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //2-create session
   const sessoin = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `https://natoursapp-lu63.onrender.com`,
+    success_url: `https://natoursapp-lu63.onrender.com/`,
     //success_url: `https://www.google.com.eg/?hl=ar`,
     cancel_url: `https://fast.com/`,
     customer_email: req.user.email,
