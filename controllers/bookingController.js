@@ -15,7 +15,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //2-create session
   const sessoin = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `https://www.google.com.eg/?hl=ar`,
+    success_url: `https://natoursapp-lu63.onrender.com`,
     //success_url: `https://www.google.com.eg/?hl=ar`,
     cancel_url: `https://fast.com/`,
     customer_email: req.user.email,
@@ -66,7 +66,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async session => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.line_items[0].unit_amount / 100;
+  const price = session.amount_total / 100;
   await Booking.create({ user, tour, price });
 };
 exports.getMyBookedTour = catchAsync(async (req, res, next) => {
@@ -92,8 +92,18 @@ exports.checkoutWebHook = async (req, res, next) => {
     return res.status(400).send(`webhook Error :${err.message}`);
   }
   if (event.type === 'checkout.session.completed') {
-    console.log('session is recevied ::', event);
+    const session = event.data.object;
+    // Access the line items
+    // stripe.checkout.sessions.listLineItems(session.id, (err, lineItems) => {
+    //   if (err) {
+    //     console.error(err);
+    //     return res.status(500).send(err);
+    //   }
+    //   // Process the line items (see step 4)
+    //   // ...
+    // });
 
+    //console.log('session is recevied ::', event);
     createBookingCheckout(event.data.object);
   }
   res.status(200).json({ received: true });
