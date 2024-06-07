@@ -15,11 +15,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //2-create session
   const sessoin = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    // success_url: `${req.protocol}://${req.host}:3000/?tour=${
-    //   req.params.tourId
-    // }&user=${req.user.id}&price=${tour.price}`,
-    success_url: `${req.protocol}://${req.host}:3000/my-tours`,
-    cancel_url: `${req.protocol}://${req.host}/tours/${tour.slug}`,
+    success_url: `https://www.google.com.eg/?hl=ar`,
+    //success_url: `https://www.google.com.eg/?hl=ar`,
+    cancel_url: `https://fast.com/`,
     customer_email: req.user.email,
     // infrmation about product
     client_reference_id: req.params.tourId,
@@ -50,6 +48,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     mode: 'payment'
     //3-send response
   });
+  console.log('success');
   res.status(200).json({
     status: 'success',
     session: sessoin
@@ -66,7 +65,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 const createBookingCheckout = async session => {
   const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email }))._id;
+  const user = (await User.findOne({ email: session.customer_email })).id;
   const price = session.line_items[0].unit_amount / 100;
   await Booking.create({ user, tour, price });
 };
@@ -78,20 +77,24 @@ exports.getMyBookedTour = catchAsync(async (req, res, next) => {
     myTours
   });
 });
-exports.checkoutWebHook = (req, res, next) => {
+exports.checkoutWebHook = async (req, res, next) => {
+  console.log('5555 web hook started 55555555');
   const signature = req.headers['stripe-signature'];
-  let stripeEvent;
+  let event;
   try {
-    stripeEvent = stripe.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SERCRET
     );
   } catch (err) {
+    console.log('web hook error');
     return res.status(400).send(`webhook Error :${err.message}`);
   }
-  if (stripeEvent.type === 'checkout-session-complete') {
-    createBookingCheckout(stripeEvent.data.object);
+  if (event.type === 'payment_intent.succeeded') {
+    console.log('session is recevied ::', event);
+
+    createBookingCheckout(event.data.object);
   }
   res.status(200).json({ received: true });
 };
