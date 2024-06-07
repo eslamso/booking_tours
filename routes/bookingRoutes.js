@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(authController.protect);
 router.post(
   '/checkout-session/:tourId',
-  //bookingController.checkIfHasBookedTour,
+  bookingController.checkIfHasBookedTour,
   bookingController.getCheckoutSession
 );
 router.get('/my-booked-tours', bookingController.getMyBookedTour);
